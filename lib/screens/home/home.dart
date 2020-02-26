@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
 
   Widget buildPlanetWithText(String text, {String path}) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed('/explore${text ?? path}'),
+      onTap: () => Navigator.of(context).pushNamed('/explore${path ?? text}'),
       child: Stack(
         children: <Widget>[
           buildCircText(text),

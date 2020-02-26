@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:ks2020/services/database/user_database_service.dart';
 
 class AuthService {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -8,6 +9,14 @@ class AuthService {
     'email',
     'https://www.googleapis.com/auth/userinfo.profile',
   ]);
+
+  Future<FirebaseUser> get currUser async {
+    return await _auth.currentUser();
+  }
+
+  Future<String> get uid async {
+    return (await currUser).uid;
+  }
 
   Future<bool> anonymousSignIn() async {
     return (await _auth.signInAnonymously()) != null;
@@ -24,7 +33,9 @@ class AuthService {
     );
 
     final AuthResult authResult = await _auth.signInWithCredential(credential);
-    if (authResult.additionalUserInfo.isNewUser) {}
+    if (authResult.additionalUserInfo.isNewUser) {
+      UserDatabaseService().createNewUser(authResult.user);
+    }
     return authResult == null;
   }
 

@@ -16,7 +16,21 @@ class UserDatabaseService {
     });
   }
 
-  Future<UserModel> get user async {
-    return UserModel.fromJson((await _user.document(uid).get()).data);
+  subscribe(String topic) {
+    _user.document(uid).updateData({
+      'subs': FieldValue.arrayUnion([topic])
+    });
+  }
+
+  unsubscribe(String topic) {
+    _user.document(uid).updateData({
+      'subs': FieldValue.arrayRemove([topic])
+    });
+  }
+
+  Stream<UserModel> get user {
+    return _user.document(uid).snapshots().map(
+          (dss) => UserModel.fromJson(dss.data),
+        );
   }
 }

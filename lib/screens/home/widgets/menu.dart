@@ -86,7 +86,6 @@ class _MenuState extends State<Menu> {
             children: List.generate(3, (i) {
               final double rad = radians((i * 60).toDouble() + 210);
               double k = size[i];
-              print('Painting $i');
               return Transform(
                 transform: Matrix4.identity()
                   ..translate(radius * cos(rad), radius * sin(rad)),
