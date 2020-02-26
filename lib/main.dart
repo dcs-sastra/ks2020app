@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ks2020/screens/landing/landing.dart';
 import 'package:ks2020/wrapper.dart';
 
 void main() => runApp(MyApp());
