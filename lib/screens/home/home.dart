@@ -9,17 +9,8 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  AnimationController controller;
-
-  PageController _pageController = PageController();
-
-  @override
-  void initState() {
-    controller =
-        AnimationController(duration: Duration(milliseconds: 500), vsync: this);
-    super.initState();
-  }
+class _HomeState extends State<Home> {
+  PageController _pageController = PageController(initialPage: 1);
 
   @override
   Widget build(BuildContext context) {
@@ -43,24 +34,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               Container(
                 width: double.maxFinite,
                 child: PageView(
+                  physics: BouncingScrollPhysics(),
                   controller: _pageController,
                   children: <Widget>[
-                    buildPlanetWithText('Sponsors'),
-                    buildPlanetWithText('Explore Events'),
                     buildPlanetWithText('Proshows'),
-                  ]
-                      .map((e) => Column(
-                            children: <Widget>[
-                              e,
-                              SizedBox(height: 16),
-                              Icon(
-                                Icons.keyboard_arrow_up,
-                                color: Colors.white,
-                                size: 48,
-                              ),
-                            ],
-                          ))
-                      .toList(),
+                    buildPlanetWithText('Explore Events', path: 'Events'),
+                    buildPlanetWithText('Sponsors'),
+                  ].map(addArrow).toList(),
                 ),
               ),
               Align(
@@ -74,12 +54,27 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget buildPlanetWithText(String text) {
-    return Stack(
-      children: <Widget>[
-        buildCircText(text),
-        buildPlanet(),
-      ],
+  Column addArrow(e) => Column(
+        children: <Widget>[
+          e,
+          SizedBox(height: 16),
+          Icon(
+            Icons.keyboard_arrow_up,
+            color: Colors.white,
+            size: 48,
+          ),
+        ],
+      );
+
+  Widget buildPlanetWithText(String text, {String path}) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pushNamed('/explore${text ?? path}'),
+      child: Stack(
+        children: <Widget>[
+          buildCircText(text),
+          buildPlanet(),
+        ],
+      ),
     );
   }
 

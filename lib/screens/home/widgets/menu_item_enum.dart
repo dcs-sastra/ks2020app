@@ -1,0 +1,1 @@
+enum MenuItemEnum { SPONSORS, EVENTS, PROSHOWS }

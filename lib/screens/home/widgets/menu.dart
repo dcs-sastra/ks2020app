@@ -1,36 +1,44 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'circular_menu.dart';
+import 'package:ks2020/screens/home/widgets/vertical_text.dart';
+import 'package:vector_math/vector_math.dart' show radians;
+
 import 'half_circle.dart';
 
 class Menu extends StatefulWidget {
-  PageController animationController;
-  Menu(this.animationController);
+  PageController pageController;
+  Menu(this.pageController);
 
   @override
   _MenuState createState() => _MenuState();
 }
 
-enum MenuItem { EVENTS, SPONSORS, PROSHOWS }
-
-class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
-  static const Duration duration = const Duration(milliseconds: 200);
-  MenuItem active = MenuItem.EVENTS;
-
-  AnimationController animationController;
-  Animation animation;
+class _MenuState extends State<Menu> {
+  List<String> menuItems = ['PROSHOWS', 'EVENTS', 'SPONSORS'];
+  PageController pageController;
+  List<double> size = [0, 1, 0];
+  static const double radius = 112;
 
   @override
   void initState() {
-    animationController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 500),
-    );
-    animation = Tween<double>(begin: 0, end: 1.0472).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
+    pageController = widget.pageController
+      ..addListener(() {
+        double temp = pageController.page;
+        if (temp <= 1.0) {
+          size[0] = 1 - temp;
+          size[1] = temp;
+          size[2] = 0;
+        } else {
+          size[0] = 0;
+          size[1] = (temp - 2).abs();
+          size[2] = 1 - (temp - 2).abs();
+        }
+        setState(() {
+          size = size;
+        });
+      });
     super.initState();
   }
 
@@ -44,122 +52,75 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             painter: HalfCircle(),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            animationController.forward();
-          },
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Image.asset('assets/planet2.png'),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Image.asset('assets/planet2.png'),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Row(
+            children: List.generate(
+              3,
+              (i) => Flexible(
+                flex: 1,
+                child: Container(
+                  height: 325,
+                  child: InkWell(
+                    onTap: () {
+                      pageController.animateToPage(
+                        i,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: RadialAnimation(0.1 * 360),
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: List.generate(3, (i) {
+              final double rad = radians((i * 60).toDouble() + 210);
+              double k = size[i];
+              print('Painting $i');
+              return Transform(
+                transform: Matrix4.identity()
+                  ..translate(radius * cos(rad), radius * sin(rad)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    VerticalText(
+                      menuItems[i],
+                      style: TextStyle(
+                        fontSize: lerpDouble(18, 20, k),
+                        color: Colors.white,
+                        fontWeight: FontWeight.lerp(
+                          FontWeight.normal,
+                          FontWeight.bold,
+                          k,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      height: lerpDouble(64, 80, k),
+                      width: lerpDouble(64, 80, k),
+                      child: Image.asset(
+                        'assets/planet3.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
         )
-        // Align(
-        //   alignment: Alignment.bottomCenter,
-        //   child: AnimatedBuilder(
-        //     animation: animation,
-        //     builder: (bc, child) {
-        //       return Transform(
-        //         child: Container(
-        //           // color: Colors.white,
-        //           padding: EdgeInsets.fromLTRB(64, 0, 64, 32),
-        //           height: 272,
-        //           width: MediaQuery.of(context).size.width,
-        //           child: Stack(
-        //             children: <Widget>[
-        //               Align(
-        //                 alignment: Alignment.topRight,
-        //                 child: GestureDetector(
-        //                   onTap: () {},
-        //                   child: Column(
-        //                     mainAxisSize: MainAxisSize.min,
-        //                     children: <Widget>[
-        //                       VerticalText(
-        //                         'PROSHOWS',
-        //                         style: TextStyle(
-        //                           fontSize: 18,
-        //                           color: Colors.white,
-        //                         ),
-        //                       ),
-        //                       SizedBox(height: 8),
-        //                       Image.asset('assets/planet3.png'),
-        //                     ],
-        //                   ),
-        //                 ),
-        //               ),
-        //               Align(
-        //                 alignment: Alignment.topLeft,
-        //                 child: GestureDetector(
-        //                   onTap: () {},
-        //                   child: Column(
-        //                     mainAxisSize: MainAxisSize.min,
-        //                     children: <Widget>[
-        //                       VerticalText(
-        //                         'SPONSORS',
-        //                         style: TextStyle(
-        //                           fontSize: 18,
-        //                           color: Colors.white,
-        //                         ),
-        //                       ),
-        //                       SizedBox(height: 8),
-        //                       Image.asset('assets/planet3.png'),
-        //                     ],
-        //                   ),
-        //                 ),
-        //               ),
-        //               Align(
-        //                 alignment: Alignment.topCenter,
-        //                 child: GestureDetector(
-        //                   onTap: () {},
-        //                   child: Column(
-        //                     children: <Widget>[
-        //                       VerticalText(
-        //                         'EVENTS',
-        //                         style: TextStyle(
-        //                           fontSize: 18,
-        //                           // fontWeight: FontWeight.bold,
-        //                           color: Colors.white,
-        //                         ),
-        //                       ),
-        //                       SizedBox(height: 8),
-        //                       Container(
-        //                         // height: 80,
-        //                         // width: 80,
-        //                         child: Image.asset(
-        //                           'assets/planet3.png',
-        //                           fit: BoxFit.cover,
-        //                         ),
-        //                       ),
-        //                     ],
-        //                   ),
-        //                 ),
-        //               ),
-        //             ],
-        //           ),
-        //         ),
-        //         alignment: FractionalOffset.bottomCenter,
-        //         transform: new Matrix4.rotationZ(animation.value),
-        //       );
-        //     },
-        //     child: Container(),
-        //   ),
-        // )
       ],
     );
-  }
-
-  int getInd() {
-    switch (active) {
-      case MenuItem.EVENTS:
-        return 1;
-      case MenuItem.PROSHOWS:
-        return 2;
-      case MenuItem.SPONSORS:
-        return 0;
-      default:
-    }
   }
 }
