@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 class VerticalText extends StatelessWidget {
   final String text;
   final TextStyle style;
-  const VerticalText(this.text, {this.style});
+  const VerticalText(
+    this.text, {
+    this.style = const TextStyle(color: Colors.white),
+  });
 
   String vertical() {
     return text

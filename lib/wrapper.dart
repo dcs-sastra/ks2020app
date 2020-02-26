@@ -11,7 +11,7 @@ class Wrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        textTheme: GoogleFonts. josefinSansTextTheme(),
+        textTheme: GoogleFonts.josefinSansTextTheme(),
       ),
       routes: {
         '/': (_) => AuthWrapper(),
